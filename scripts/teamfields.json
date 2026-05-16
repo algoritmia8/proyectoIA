@@ -1,0 +1,13 @@
+{
+  "defaultValue": "Algoritmia IA\\Coordinación",
+  "values": [
+    { "value": "Algoritmia IA\\Coordinación", "includeChildren": true },
+    { "value": "Algoritmia IA\\Customer Engagement", "includeChildren": true },
+    { "value": "Algoritmia IA\\Business Central", "includeChildren": true },
+    { "value": "Algoritmia IA\\Finance", "includeChildren": true },
+    { "value": "Algoritmia IA\\SCM", "includeChildren": true },
+    { "value": "Algoritmia IA\\Prog. Finance-PP", "includeChildren": true },
+    { "value": "Algoritmia IA\\Prog. Web-Data", "includeChildren": true },
+    { "value": "Algoritmia IA\\Azure", "includeChildren": true }
+  ]
+}

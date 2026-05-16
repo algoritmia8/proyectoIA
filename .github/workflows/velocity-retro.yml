@@ -1,0 +1,26 @@
+name: Velocity & Retrospectiva
+on:
+  workflow_run:
+    workflows: ["Sprint Close"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  velocity-retro:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run velocity & retro
+        env:
+          ADO_PAT: ${{ secrets.ADO_PAT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python .github/scripts/velocity_retro.py
+      - name: Commit velocity data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add sprint-memory/velocity.json || true
+          git diff --staged --quiet || git commit -m "📊 Update velocity data" && git push

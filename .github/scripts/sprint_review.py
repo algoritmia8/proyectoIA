@@ -253,6 +253,17 @@ def load_memory() -> dict:
     return {}
 
 
+def archive_sprint(prev: dict) -> None:
+    """Archiva la memoria del sprint anterior antes de reiniciar."""
+    prev_sprint = prev.get("sprint", "unknown")
+    archive_dir = "sprint-memory/archive"
+    os.makedirs(archive_dir, exist_ok=True)
+    filename = f"{archive_dir}/{prev_sprint.replace(' ', '-').replace('/', '-')}.json"
+    with open(filename, "w", encoding="utf-8") as f:
+        json.dump(prev, ensure_ascii=False, indent=2, fp=f)
+    print(f"📁  Sprint anterior archivado: {filename}")
+
+
 def save_memory(data: dict, sprint_name: str, items: list[dict], now: datetime) -> None:
     os.makedirs("sprint-memory", exist_ok=True)
     incomplete = [i for i in items if i["fields"]["System.State"] not in DONE_STATES]
@@ -626,6 +637,13 @@ def main() -> None:
     now = datetime.now(timezone.utc)
     print(f"🕗  Sprint Review Agent — {now.isoformat()}")
 
+    # DST guard: si ya se ejecutó hoy (por doble cron), salir
+    prev_check = load_memory()
+    last_run = prev_check.get("last_run", "")
+    if last_run and last_run[:10] == now.strftime("%Y-%m-%d"):
+        print("ℹ️   Ya se ejecutó hoy (doble cron DST). Saliendo.")
+        return
+
     # 1. Sprint activo
     sprint = get_current_sprint()
     if not sprint:
@@ -643,7 +661,8 @@ def main() -> None:
     prev = load_memory()
     prev_sprint = prev.get("sprint", "")
     if prev_sprint and prev_sprint != sprint_name:
-        print(f"ℹ️   Sprint nuevo detectado ({prev_sprint} → {sprint_name}), memoria reiniciada")
+        print(f"ℹ️   Sprint nuevo detectado ({prev_sprint} → {sprint_name}), archivando y reiniciando memoria")
+        archive_sprint(prev)
         prev = {}
 
     # 4. Detectar cambios

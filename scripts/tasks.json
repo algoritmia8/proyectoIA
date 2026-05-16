@@ -1,0 +1,171 @@
+﻿{
+    "alba-SCM":  {
+                     "req":  13880,
+                     "tasks":  [
+                                   13927,
+                                   13928,
+                                   13929
+                               ]
+                 },
+    "radar-SCM":  {
+                      "req":  13881,
+                      "tasks":  [
+                                    13930,
+                                    13931
+                                ]
+                  },
+    "radar-Finance":  {
+                          "req":  13876,
+                          "tasks":  [
+                                        13922,
+                                        13923
+                                    ]
+                      },
+    "knowledge-Customer Engagement":  {
+                                          "req":  13867,
+                                          "tasks":  [
+                                                        13908,
+                                                        13909,
+                                                        13910
+                                                    ]
+                                      },
+    "radar-Business Central":  {
+                                   "req":  13871,
+                                   "tasks":  [
+                                                 13914,
+                                                 13915
+                                             ]
+                               },
+    "knowledge-SCM":  {
+                          "req":  13882,
+                          "tasks":  [
+                                        13932,
+                                        13933,
+                                        13934
+                                    ]
+                      },
+    "alba-Prog. Finance-PP":  {
+                                  "req":  13885,
+                                  "tasks":  [
+                                                13935,
+                                                13936,
+                                                13937
+                                            ]
+                              },
+    "alba-Customer Engagement":  {
+                                     "req":  13865,
+                                     "tasks":  [
+                                                   13903,
+                                                   13904,
+                                                   13905
+                                               ]
+                                 },
+    "knowledge-Azure":  {
+                            "req":  13897,
+                            "tasks":  [
+                                          13956,
+                                          13957,
+                                          13958
+                                      ]
+                        },
+    "knowledge-Finance":  {
+                              "req":  13877,
+                              "tasks":  [
+                                            13924,
+                                            13925,
+                                            13926
+                                        ]
+                          },
+    "radar-Azure":  {
+                        "req":  13896,
+                        "tasks":  [
+                                      13954,
+                                      13955
+                                  ]
+                    },
+    "radar-Prog. Finance-PP":  {
+                                   "req":  13886,
+                                   "tasks":  [
+                                                 13938,
+                                                 13939
+                                             ]
+                               },
+    "radar-Customer Engagement":  {
+                                      "req":  13866,
+                                      "tasks":  [
+                                                    13906,
+                                                    13907
+                                                ]
+                                  },
+    "knowledge-Prog. Finance-PP":  {
+                                       "req":  13887,
+                                       "tasks":  [
+                                                     13940,
+                                                     13941,
+                                                     13942
+                                                 ]
+                                   },
+    "knowledge-Prog. Web-Data":  {
+                                     "req":  13892,
+                                     "tasks":  [
+                                                   13948,
+                                                   13949,
+                                                   13950
+                                               ]
+                                 },
+    "alba-Prog. Web-Data":  {
+                                "req":  13890,
+                                "tasks":  [
+                                              13943,
+                                              13944,
+                                              13945
+                                          ]
+                            },
+    "radar-Prog. Web-Data":  {
+                                 "req":  13891,
+                                 "tasks":  [
+                                               13946,
+                                               13947
+                                           ]
+                             },
+    "alba-Finance":  {
+                         "req":  13875,
+                         "tasks":  [
+                                       13919,
+                                       13920,
+                                       13921
+                                   ]
+                     },
+    "knowledge-Business Central":  {
+                                       "req":  13872,
+                                       "tasks":  [
+                                                     13916,
+                                                     13917,
+                                                     13918
+                                                 ]
+                                   },
+    "alba-Azure":  {
+                       "req":  13895,
+                       "tasks":  [
+                                     13951,
+                                     13952,
+                                     13953
+                                 ]
+                   },
+    "alba-Business Central":  {
+                                  "req":  13870,
+                                  "tasks":  [
+                                                13911,
+                                                13912,
+                                                13913
+                                            ]
+                              },
+    "alba-Coordinacion":  {
+                              "req":  13863,
+                              "tasks":  [
+                                            13900,
+                                            13901,
+                                            13902
+                                        ]
+                          }
+}

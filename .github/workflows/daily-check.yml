@@ -1,0 +1,31 @@
+name: "Daily Check — Detección temprana"
+
+on:
+  schedule:
+    - cron: "0 7 * * 1-5"   # Lunes a viernes 09:00 CEST / 08:00 CET
+    - cron: "0 8 * * 1-5"
+  workflow_dispatch:
+
+jobs:
+  daily-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run Daily Check
+        env:
+          ADO_PAT:       ${{ secrets.ADO_PAT }}
+          SMTP_HOST:     smtp.office365.com
+          SMTP_PORT:     "587"
+          SMTP_USER:     ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          EMAIL_TO:      ifont@algoritmia8.com
+        run: python .github/scripts/daily_check.py

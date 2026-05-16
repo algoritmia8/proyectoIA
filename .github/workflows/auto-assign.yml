@@ -1,0 +1,16 @@
+name: Auto-Assign Unassigned Items
+on:
+  schedule:
+    - cron: '30 7 * * 1-5'
+    - cron: '30 8 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  auto-assign:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run auto-assign
+        env:
+          ADO_PAT: ${{ secrets.ADO_PAT }}
+        run: python .github/scripts/auto_assign.py

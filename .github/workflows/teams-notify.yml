@@ -1,0 +1,35 @@
+name: Teams Notification
+on:
+  workflow_call:
+    inputs:
+      title:
+        type: string
+        required: true
+      message:
+        type: string
+        required: true
+    secrets:
+      TEAMS_WEBHOOK_URL:
+        required: true
+  workflow_dispatch:
+    inputs:
+      title:
+        description: 'Notification title'
+        required: true
+        default: '🔔 Test Notification'
+      message:
+        description: 'Notification message'
+        required: true
+        default: 'Test desde GitHub Actions'
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Send Teams notification
+        env:
+          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          TEAMS_TITLE: ${{ inputs.title }}
+          TEAMS_MESSAGE: ${{ inputs.message }}
+        run: python .github/scripts/teams_notify.py

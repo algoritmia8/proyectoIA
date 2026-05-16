@@ -1,0 +1,16 @@
+name: Sprint Planning Assistant
+on:
+  workflow_dispatch:
+
+jobs:
+  planning:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run planning assistant
+        env:
+          ADO_PAT: ${{ secrets.ADO_PAT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python .github/scripts/sprint_planning.py

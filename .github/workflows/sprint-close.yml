@@ -1,0 +1,36 @@
+name: "Sprint Close — Cierre automático"
+
+on:
+  schedule:
+    # Lunes a las 06:00 UTC — detecta sprint que terminó el fin de semana
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sprint-close:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run Sprint Close
+        env:
+          ADO_PAT:       ${{ secrets.ADO_PAT }}
+          SMTP_HOST:     smtp.office365.com
+          SMTP_PORT:     "587"
+          SMTP_USER:     ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          EMAIL_TO:      ifont@algoritmia8.com
+        run: python .github/scripts/sprint_close.py

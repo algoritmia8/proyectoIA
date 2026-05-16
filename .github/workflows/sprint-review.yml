@@ -2,10 +2,10 @@ name: "Sprint Review — Viernes 8:00"
 
 on:
   schedule:
-    # 8:00 AM hora España (CEST = UTC+2 → 06:00 UTC en verano)
-    # Ajustar a 07:00 UTC en invierno (CET = UTC+1)
-    - cron: "0 6 * * 5"
-  workflow_dispatch:   # Ejecución manual desde GitHub Actions
+    # Viernes 8:00 hora España: dos crons para cubrir CEST y CET automáticamente
+    - cron: "0 6 * * 5"   # 08:00 CEST (verano: abr-oct)
+    - cron: "0 7 * * 5"   # 08:00 CET  (invierno: nov-mar)
+  workflow_dispatch:
 
 permissions:
   contents: write   # Necesario para el autocommit de la memoria
@@ -47,3 +47,36 @@ jobs:
             git commit -m "chore(sprint): revisión semanal $(date -u '+%Y-%m-%d')" &&
             git push
           )
+
+  # ─── Notificación de fallos ──────────────────────────────────────────────
+  notify-failure:
+    runs-on: ubuntu-latest
+    needs: sprint-review
+    if: failure()
+    steps:
+      - name: Send failure notification email
+        env:
+          SMTP_HOST:     smtp.office365.com
+          SMTP_PORT:     "587"
+          SMTP_USER:     ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          EMAIL_TO:      ifont@algoritmia8.com
+        run: |
+          python3 -c "
+          import smtplib, os
+          from email.mime.text import MIMEText
+          msg = MIMEText(
+              '<h2>⚠️ Sprint Review Agent — FALLO</h2>'
+              '<p>El workflow <b>Sprint Review</b> ha fallado.</p>'
+              '<p><a href=\"https://github.com/algoritmia8/proyectoIA/actions\">Ver logs en GitHub Actions</a></p>',
+              'html', 'utf-8'
+          )
+          msg['Subject'] = '🚨 [Sprint Review] Workflow FALLIDO'
+          msg['From'] = os.environ['SMTP_USER']
+          msg['To'] = os.environ['EMAIL_TO']
+          with smtplib.SMTP(os.environ['SMTP_HOST'], int(os.environ['SMTP_PORT'])) as s:
+              s.starttls()
+              s.login(os.environ['SMTP_USER'], os.environ['SMTP_PASSWORD'])
+              s.sendmail(msg['From'], msg['To'], msg.as_string())
+          print('Failure notification sent')
+          "
