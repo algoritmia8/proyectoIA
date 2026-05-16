@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: write   # Necesario para el autocommit de la memoria
+  models: read      # Necesario para GitHub Models API (evaluación IA)
 
 jobs:
   sprint-review:
