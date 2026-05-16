@@ -11,12 +11,15 @@ Cada viernes a las 8:00 AM (hora España):
 """
 
 import os
+import re
 import json
 import base64
 import smtplib
+import html as _html_lib
 from datetime import datetime, timezone
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from html.parser import HTMLParser
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
 
@@ -36,6 +39,32 @@ SMTP_PASSWORD = os.environ["SMTP_PASSWORD"]
 EMAIL_TO      = os.environ.get("EMAIL_TO", "ifont@algoritmia8.com")
 
 DONE_STATES = {"Done", "Closed", "Resolved"}
+
+# ─── GitHub Models AI ─────────────────────────────────────────────────────────
+GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
+AI_ENDPOINT  = "https://models.inference.ai.azure.com/chat/completions"
+AI_MODEL     = "gpt-4o-mini"
+
+# ─── Helpers HTML / texto ────────────────────────────────────────────────────
+class _HTMLStripper(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self._parts: list[str] = []
+    def handle_data(self, d: str) -> None:
+        self._parts.append(d)
+    def get_data(self) -> str:
+        return " ".join(self._parts)
+
+
+def strip_html(text: str) -> str:
+    """Elimina etiquetas HTML y decodifica entidades."""
+    if not text:
+        return ""
+    s = _HTMLStripper()
+    s.feed(_html_lib.unescape(text))
+    cleaned = re.sub(r"\s+", " ", s.get_data())
+    return cleaned.strip()
+
 
 # ─── Helpers Azure DevOps ─────────────────────────────────────────────────────
 def _ado_headers():
@@ -94,7 +123,8 @@ def get_sprint_items(iteration_path: str) -> list[dict]:
     # Batch fetch detalle
     fields = (
         "System.Id,System.Title,System.State,System.AssignedTo,"
-        "System.WorkItemType,System.AreaPath,System.ChangedDate"
+        "System.WorkItemType,System.AreaPath,System.ChangedDate,"
+        "System.Description,Microsoft.VSTS.Common.AcceptanceCriteria"
     )
     items = []
     for i in range(0, len(ids), 200):
@@ -104,6 +134,91 @@ def get_sprint_items(iteration_path: str) -> list[dict]:
         data = _get(url)
         items.extend(data.get("value", []))
     return items
+
+
+# ─── Evaluación IA ───────────────────────────────────────────────────────────
+def evaluate_with_ai(sprint_name: str, items: list[dict]) -> dict:
+    """
+    Llama a GitHub Models (gpt-4o-mini) para evaluar el contenido de los ítems.
+    Devuelve dict con 'resumen_ejecutivo' y 'items' (por id: calidad/riesgo/coherencia/sugerencias).
+    Si falla o no hay token, devuelve {}.
+    """
+    if not GITHUB_TOKEN:
+        print("⚠️  GITHUB_TOKEN no disponible — saltando evaluación IA")
+        return {}
+
+    pending = [i for i in items if i["fields"]["System.State"] not in DONE_STATES][:60]
+    done    = [i for i in items if i["fields"]["System.State"] in DONE_STATES]
+
+    items_data = []
+    for item in pending:
+        f = item["fields"]
+        items_data.append({
+            "id":                    str(item["id"]),
+            "tipo":                  f.get("System.WorkItemType", ""),
+            "estado":                f.get("System.State", ""),
+            "titulo":                (f.get("System.Title") or "")[:120],
+            "descripcion":           strip_html(f.get("System.Description") or "")[:400],
+            "criterios_aceptacion":  strip_html(f.get("Microsoft.VSTS.Common.AcceptanceCriteria") or "")[:300],
+        })
+
+    done_summary = [
+        {"id": str(i["id"]), "titulo": (i["fields"].get("System.Title") or "")[:80]}
+        for i in done
+    ]
+
+    prompt = (
+        f'Eres un Scrum Master experto analizando el sprint "{sprint_name}".\n'
+        'Responde ÚNICAMENTE con un objeto JSON válido (sin markdown) con esta estructura:\n'
+        '{\n'
+        '  "resumen_ejecutivo": "3-5 frases: estado del sprint, completados, riesgos, recomendación.",\n'
+        '  "items": {\n'
+        '    "<id>": {\n'
+        '      "calidad": 1,\n'
+        '      "riesgo": "bajo",\n'
+        '      "coherencia": true,\n'
+        '      "sugerencias": ""\n'
+        '    }\n'
+        '  }\n'
+        '}\n\n'
+        'Criterios:\n'
+        '- calidad: 1 (sin descripción ni criterios) a 5 (ítem perfectamente definido)\n'
+        '- riesgo: "bajo" | "medio" | "alto" — considera ambigüedad, tamaño o dependencias\n'
+        '- coherencia: true si encaja en el sprint, false si parece fuera de lugar\n'
+        '- sugerencias: máximo 2 frases concretas de mejora, o "" si está bien\n\n'
+        f'SPRINT: {sprint_name}\n\n'
+        f'ÍTEMS PENDIENTES:\n{json.dumps(items_data, ensure_ascii=False)}\n\n'
+        f'ÍTEMS COMPLETADOS (solo para contexto):\n{json.dumps(done_summary, ensure_ascii=False)}'
+    )
+
+    body = json.dumps({
+        "model":           AI_MODEL,
+        "messages":        [{"role": "user", "content": prompt}],
+        "max_tokens":      4000,
+        "temperature":     0.2,
+        "response_format": {"type": "json_object"},
+    }).encode()
+
+    req = Request(
+        AI_ENDPOINT,
+        data=body,
+        headers={
+            "Authorization": f"Bearer {GITHUB_TOKEN}",
+            "Content-Type":  "application/json",
+        },
+        method="POST",
+    )
+    try:
+        with urlopen(req, timeout=90) as r:
+            resp    = json.loads(r.read())
+        content = resp["choices"][0]["message"]["content"]
+        result  = json.loads(content)
+        n = len(result.get("items", {}))
+        print(f"🤖  Evaluación IA completada — {n} ítems evaluados")
+        return result
+    except Exception as exc:
+        print(f"⚠️  Error en evaluación IA: {exc}")
+        return {}
 
 
 # ─── Memoria (lectura / escritura) ───────────────────────────────────────────
@@ -246,7 +361,13 @@ def _item_row(item: dict, bg: str = "#f8f9fa") -> str:
     )
 
 
-def build_email(sprint_name: str, items: list[dict], changes: dict, now: datetime) -> tuple[str, str]:
+def build_email(
+    sprint_name: str,
+    items: list[dict],
+    changes: dict,
+    now: datetime,
+    ai_eval: dict | None = None,
+) -> tuple[str, str]:
     incomplete  = [i for i in items if i["fields"]["System.State"] not in DONE_STATES]
     complete    = [i for i in items if i["fields"]["System.State"] in DONE_STATES]
     pct         = round(len(complete) / len(items) * 100) if items else 0
@@ -302,6 +423,57 @@ def build_email(sprint_name: str, items: list[dict], changes: dict, now: datetim
     if not changes_html:
         changes_html = '<p style="color:#6c757d"><i>Sin cambios detectados respecto a la última revisión.</i></p>'
 
+    # ── Análisis IA ──
+    ai_summary_html = ""
+    ai_quality_html = ""
+    if ai_eval:
+        summary = ai_eval.get("resumen_ejecutivo", "")
+        if summary:
+            ai_summary_html = (
+                '<div style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);'
+                'color:white;padding:20px 24px;border-radius:8px;margin:20px 0">'
+                '<div style="font-size:1.05rem;font-weight:bold;margin-bottom:8px">'
+                '🤖 Análisis IA del sprint</div>'
+                f'<p style="margin:0;line-height:1.7">{summary}</p>'
+                '</div>'
+            )
+
+        ai_items = ai_eval.get("items", {})
+        risk_colors = {"bajo": "#28a745", "medio": "#fd7e14", "alto": "#dc3545"}
+        flagged = [
+            (iid, info)
+            for iid, info in ai_items.items()
+            if info.get("calidad", 5) <= 2 or info.get("riesgo") == "alto" or not info.get("coherencia", True)
+        ]
+        if flagged:
+            # Build a lookup title map
+            title_map = {str(i["id"]): i["fields"].get("System.Title", "") for i in items}
+            rows_flagged = []
+            for iid, info in sorted(flagged, key=lambda x: x[1].get("calidad", 5)):
+                calidad  = info.get("calidad", 0)
+                riesgo   = info.get("riesgo", "")
+                coherent = info.get("coherencia", True)
+                sugg     = info.get("sugerencias", "")
+                stars    = "★" * calidad + "☆" * (5 - calidad)
+                rc       = risk_colors.get(riesgo, "#6c757d")
+                badges   = f'<span style="color:{rc};font-weight:bold">[riesgo: {riesgo}]</span>'
+                if not coherent:
+                    badges += ' <span style="color:#6610f2;font-weight:bold">[fuera de contexto]</span>'
+                item_url = f"https://algoritmia8.visualstudio.com/Algoritmia%20IA/_workitems/edit/{iid}"
+                title    = (title_map.get(iid) or "")[:70]
+                rows_flagged.append(
+                    f'<div style="border-left:4px solid {rc};padding:8px 14px;margin:6px 0;'
+                    f'background:#f8f9fa;border-radius:0 4px 4px 0">'
+                    f'<b><a href="{item_url}" style="color:#0078d4">#{iid}</a> {title}</b> '
+                    f'{badges} · calidad: {stars}'
+                    + (f'<br><span style="color:#6c757d;font-size:12px">💡 {sugg}</span>' if sugg else "")
+                    + "</div>"
+                )
+            ai_quality_html = (
+                f'<h3>🔍 Ítems que necesitan mejora según IA ({len(flagged)})</h3>'
+                + "".join(rows_flagged)
+            )
+
     # ── Tabla pendientes ──
     def _row_bg(item):
         s = item["fields"].get("System.State", "")
@@ -328,6 +500,8 @@ def build_email(sprint_name: str, items: list[dict], changes: dict, now: datetim
 <p style="color:#6c757d;margin-top:-8px">
   {now.strftime("%A %d de %B de %Y — %H:%M UTC")}
 </p>
+
+{ai_summary_html}
 
 <!-- KPIs -->
 <table style="width:100%;background:#f8f9fa;border-radius:8px;padding:16px;margin:20px 0;border-collapse:collapse">
@@ -363,6 +537,8 @@ def build_email(sprint_name: str, items: list[dict], changes: dict, now: datetim
 <!-- Novedades -->
 <h3>📡 Novedades desde la última revisión</h3>
 {changes_html}
+
+{ai_quality_html}
 """
 
     if attention:
@@ -454,11 +630,15 @@ def main() -> None:
     total_changes = sum(len(v) for v in changes.values())
     print(f"🔄  {total_changes} cambios detectados")
 
-    # 5. Email
-    subject, html = build_email(sprint_name, items, changes, now)
+    # 5. Evaluación IA
+    print("🤖  Evaluando contenido con GitHub Models...")
+    ai_eval = evaluate_with_ai(sprint_name, items)
+
+    # 6. Email
+    subject, html = build_email(sprint_name, items, changes, now, ai_eval)
     send_email(subject, html)
 
-    # 6. Guardar memoria
+    # 7. Guardar memoria
     new_data = {
         "sprint":         sprint_name,
         "iteration_path": iteration_path,

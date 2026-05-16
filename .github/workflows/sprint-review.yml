@@ -34,6 +34,7 @@ jobs:
           SMTP_USER:     ${{ secrets.SMTP_USER }}
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
           EMAIL_TO:      ifont@algoritmia8.com
+          GITHUB_TOKEN:  ${{ secrets.GITHUB_TOKEN }}
         run: python .github/scripts/sprint_review.py
 
       - name: Commit memory update
