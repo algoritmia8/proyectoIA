@@ -510,7 +510,9 @@ def build_email(
 
     html = f"""<!DOCTYPE html>
 <html lang="es">
-<body style="font-family:Segoe UI,Arial,sans-serif;color:#212529;max-width:960px;margin:auto;padding:24px">
+<head><meta name="color-scheme" content="light"><meta name="supported-color-schemes" content="light"></head>
+<body style="font-family:Segoe UI,Arial,sans-serif;background-color:#ffffff;color:#212529;margin:0;padding:0">
+<div style="max-width:960px;margin:auto;padding:24px;background-color:#ffffff;color:#212529">
 
 <h2 style="color:#0078d4;border-bottom:2px solid #0078d4;padding-bottom:8px">
   📋 Revisión semanal de sprint — {sprint_name}
@@ -589,6 +591,7 @@ def build_email(
 <p style="color:#adb5bd;font-size:11px">
   Agente automático · <a href="https://github.com/algoritmia8/proyectoIA" style="color:#adb5bd">algoritmia8/proyectoIA</a> · GitHub Actions
 </p>
+</div>
 </body></html>
 """
 
