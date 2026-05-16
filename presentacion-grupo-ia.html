@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grupo de IA — Tareas y Responsabilidades · Algoritmia</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --primary: #10b981;
+    --primary-light: #34d399;
+    --primary-dark: #059669;
+    --bg-dark: #0f172a;
+    --bg-card: #1e293b;
+    --bg-card-alt: #334155;
+    --text: #f1f5f9;
+    --text-muted: #94a3b8;
+    --accent: #22d3ee;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --gradient: linear-gradient(135deg, var(--primary-dark), var(--primary));
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--bg-dark);
+    color: var(--text);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  .deck { position: relative; width: 100vw; height: 100vh; }
+
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    padding: 4vh 6vw;
+    opacity: 0; visibility: hidden;
+    transition: opacity .5s ease, transform .5s ease;
+    transform: translateX(40px);
+  }
+  .slide.active { opacity: 1; visibility: visible; transform: translateX(0); }
+  .slide.prev { opacity: 0; visibility: hidden; transform: translateX(-40px); }
+
+  h1 { font-size: clamp(2rem, 4vw, 3.5rem); font-weight: 800; line-height: 1.15; margin-bottom: .4em; }
+  h2 { font-size: clamp(1.6rem, 3vw, 2.6rem); font-weight: 700; line-height: 1.2; margin-bottom: .5em; }
+  h3 { font-size: clamp(1.1rem, 1.8vw, 1.5rem); font-weight: 600; margin-bottom: .4em; }
+  p, li { font-size: clamp(.95rem, 1.4vw, 1.25rem); line-height: 1.6; }
+  .subtitle { color: var(--text-muted); font-size: clamp(1rem, 1.6vw, 1.4rem); margin-bottom: 1.5em; }
+  .highlight { color: var(--primary-light); }
+  .accent { color: var(--accent); }
+  .tag {
+    display: inline-block; background: var(--bg-card-alt); color: var(--primary-light);
+    padding: .2em .7em; border-radius: 999px; font-size: .85em; margin: .15em;
+  }
+
+  .center { text-align: center; }
+  .left { text-align: left; }
+  .cols { display: grid; gap: 2.5vw; width: 100%; max-width: 1200px; }
+  .cols-2 { grid-template-columns: 1fr 1fr; }
+  .cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+  .card {
+    background: var(--bg-card); border: 1px solid rgba(255,255,255,.06);
+    border-radius: 16px; padding: 1.5em; text-align: left;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,.3); }
+  .card .icon { font-size: 2rem; margin-bottom: .5em; display: block; }
+
+  .full-w { width: 100%; max-width: 1200px; }
+
+  ul.clean { list-style: none; padding: 0; }
+  ul.clean li { padding: .35em 0; padding-left: 1.5em; position: relative; }
+  ul.clean li::before { content: '▸'; position: absolute; left: 0; color: var(--primary-light); font-weight: 700; }
+
+  table { border-collapse: collapse; width: 100%; max-width: 1100px; font-size: clamp(.85rem, 1.2vw, 1.05rem); }
+  th { background: var(--primary-dark); color: #fff; padding: .65em 1em; text-align: left; font-weight: 600; }
+  td { padding: .6em 1em; border-bottom: 1px solid rgba(255,255,255,.06); }
+  tr:nth-child(even) td { background: rgba(255,255,255,.02); }
+
+  .progress-bar {
+    position: fixed; top: 0; left: 0; height: 3px;
+    background: var(--gradient);
+    transition: width .4s ease;
+    z-index: 100;
+  }
+
+  .controls {
+    position: fixed; bottom: 2vh; right: 3vw;
+    display: flex; gap: .6em; align-items: center; z-index: 100;
+  }
+  .controls button {
+    background: var(--bg-card); border: 1px solid rgba(255,255,255,.1);
+    color: var(--text); width: 44px; height: 44px; border-radius: 12px;
+    font-size: 1.2rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .2s, border-color .2s;
+  }
+  .controls button:hover { background: var(--bg-card-alt); border-color: var(--primary); }
+  .slide-counter {
+    font-size: .9rem; color: var(--text-muted); min-width: 5em; text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .fs-btn {
+    position: fixed; bottom: 2vh; left: 3vw; z-index: 100;
+    background: var(--bg-card); border: 1px solid rgba(255,255,255,.1);
+    color: var(--text-muted); padding: .5em .9em; border-radius: 10px;
+    font-size: .8rem; cursor: pointer; transition: background .2s;
+  }
+  .fs-btn:hover { background: var(--bg-card-alt); color: var(--text); }
+
+  .org-leader {
+    background: var(--bg-card); border: 2px solid var(--primary); border-radius: 16px;
+    padding: 1em 2em; text-align: center; margin-bottom: 1.5em;
+  }
+  .org-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: .8em; width: 100%; max-width: 1100px; }
+  .org-card {
+    background: var(--bg-card); border-radius: 12px; padding: .9em .7em;
+    text-align: center; border: 1px solid rgba(255,255,255,.06);
+  }
+  .org-card .org-abbr {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--primary-dark); color: #fff; font-weight: 700; font-size: .9rem;
+    margin-bottom: .4em;
+  }
+  .org-card h3 { font-size: .82rem; margin-bottom: .15em; }
+  .org-card p { font-size: .72rem; color: var(--text-muted); line-height: 1.35; }
+
+  .section-num {
+    font-size: clamp(4rem, 8vw, 7rem); font-weight: 900;
+    color: var(--primary); opacity: .25; line-height: 1;
+  }
+  .section-title {
+    font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 800; margin-top: .2em;
+  }
+  .section-sub {
+    color: var(--text-muted); font-size: clamp(1rem, 1.6vw, 1.3rem); margin-top: .5em;
+  }
+
+  .glow {
+    position: absolute; width: 400px; height: 400px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(16,185,129,.12) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+  .slide > * { position: relative; z-index: 1; }
+  .slide > .glow { position: absolute; }
+
+  .logo {
+    display: inline-flex; align-items: center; gap: .6em;
+    font-size: 1.3rem; font-weight: 700; color: var(--primary-light);
+    margin-bottom: 1.5em; letter-spacing: .02em;
+  }
+  .logo svg { width: 42px; height: 42px; }
+
+  .task-card {
+    background: var(--bg-card); border-radius: 14px; padding: 1.3em;
+    text-align: left; border: 1px solid rgba(255,255,255,.05);
+  }
+  .task-card h3 { margin-bottom: .4em; }
+  .task-card p { font-size: .88rem; color: var(--text-muted); line-height: 1.5; }
+  .task-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--primary); color: #fff; font-weight: 700; font-size: .85rem;
+    margin-bottom: .5em;
+  }
+
+  .freq-badge {
+    display: inline-block; padding: .15em .6em; border-radius: 999px;
+    font-size: .75rem; font-weight: 600; margin-top: .4em;
+  }
+  .freq-weekly { background: rgba(34,211,238,.15); color: var(--accent); }
+  .freq-monthly { background: rgba(245,158,11,.15); color: var(--warning); }
+  .freq-ongoing { background: rgba(16,185,129,.15); color: var(--primary-light); }
+  .freq-quarterly { background: rgba(239,68,68,.15); color: #f87171; }
+
+  .checklist { list-style: none; padding: 0; }
+  .checklist li { padding: .4em 0; padding-left: 1.8em; position: relative; font-size: .92rem; }
+  .checklist li::before { content: '☐'; position: absolute; left: 0; color: var(--primary-light); font-size: 1.1rem; }
+
+  .pillar-card {
+    background: var(--bg-card); border-radius: 16px; padding: 1.3em;
+    border-top: 3px solid var(--primary); text-align: left;
+  }
+  .pillar-card h3 { margin-bottom: .5em; }
+  .pillar-card ul { list-style: none; padding: 0; }
+  .pillar-card ul li { padding: .2em 0; color: var(--text-muted); font-size: .92rem; }
+
+  .timeline { display: flex; gap: 0; width: 100%; max-width: 1100px; margin-top: 1em; }
+  .timeline-item {
+    flex: 1; position: relative; padding: 1.2em .8em .8em;
+    border-top: 3px solid var(--bg-card-alt); text-align: center;
+  }
+  .timeline-item.current { border-top-color: var(--accent); }
+  .timeline-item.next { border-top-color: var(--primary); }
+  .timeline-item .dot {
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--bg-card-alt); border: 2px solid var(--bg-card-alt);
+    position: absolute; top: -9px; left: 50%; transform: translateX(-50%);
+  }
+  .timeline-item.current .dot { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 12px var(--accent); }
+  .timeline-item.next .dot { background: var(--primary); border-color: var(--primary); }
+  .timeline-item h3 { font-size: .95rem; margin-bottom: .3em; }
+  .timeline-item p { font-size: .78rem; color: var(--text-muted); line-height: 1.4; }
+
+  @media (max-width: 900px) {
+    .cols-2, .cols-3, .cols-4 { grid-template-columns: 1fr; }
+    .org-grid { grid-template-columns: repeat(3, 1fr); }
+    .timeline { flex-wrap: wrap; }
+    .timeline-item { flex: none; width: 33%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="deck" id="deck">
+
+<!-- ============================== SLIDE 1: PORTADA ============================== -->
+<section class="slide active center" data-slide="0">
+  <div class="glow" style="top:-100px;left:-100px;"></div>
+  <div class="logo">
+    <svg viewBox="0 0 42 42" fill="none"><rect width="42" height="42" rx="10" fill="#10b981"/><text x="21" y="28" text-anchor="middle" fill="#fff" font-size="20" font-weight="800" font-family="sans-serif">A</text></svg>
+    ALBA
+  </div>
+  <h1>Grupo de <span class="highlight">Inteligencia Artificial</span></h1>
+  <p class="subtitle">Tareas, responsabilidades y hoja de ruta</p>
+  <p style="color:var(--text-muted); font-size:1rem; margin-top:1em;">
+    Reunión del Grupo de IA &nbsp;|&nbsp; Algoritmia
+  </p>
+  <p style="color:var(--text-muted); font-size:.85rem; margin-top:2em;">
+    Mayo 2026
+  </p>
+  <p style="color:var(--text-muted); font-size:.8rem; margin-top:1.5em;">
+    Usa <span class="tag">← →</span> o los botones para navegar &nbsp;·&nbsp; <span class="tag">F</span> pantalla completa
+  </p>
+</section>
+
+<!-- ============================== SLIDE 2: OBJETIVO DEL GRUPO ============================== -->
+<section class="slide center" data-slide="1">
+  <div class="glow" style="top:50%;left:50%;transform:translate(-50%,-50%);"></div>
+  <div class="section-num">01</div>
+  <div class="section-title">¿Qué es el <span class="highlight">Grupo de IA</span>?</div>
+  <div class="section-sub">Nuestro propósito, estructura y misión</div>
+</section>
+
+<!-- ============================== SLIDE 3: MISIÓN ============================== -->
+<section class="slide center" data-slide="2">
+  <h2>Nuestra <span class="highlight">Misión</span></h2>
+  <p class="subtitle" style="max-width:850px;">Mantener a Algoritmia al día en IA, tanto internamente como de cara a cliente</p>
+  <div class="cols cols-3 full-w" style="margin-top:1.5em;">
+    <div class="card center" style="border-top:3px solid var(--primary);">
+      <span class="icon">🔍</span>
+      <h3>Vigilar</h3>
+      <p style="color:var(--text-muted);">Estar al tanto de las novedades de IA relevantes para cada área de la empresa. Filtrar lo importante del ruido.</p>
+    </div>
+    <div class="card center" style="border-top:3px solid var(--accent);">
+      <span class="icon">📢</span>
+      <h3>Difundir</h3>
+      <p style="color:var(--text-muted);">Compartir el conocimiento con los compañeros. Publicar artículos, organizar sesiones y crear materiales formativos.</p>
+    </div>
+    <div class="card center" style="border-top:3px solid var(--warning);">
+      <span class="icon">🚀</span>
+      <h3>Aplicar</h3>
+      <p style="color:var(--text-muted);">Llevar la IA al día a día de nuestros proyectos y procesos. Proponer experimentos y soluciones concretas.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== SLIDE 4: EL EQUIPO ============================== -->
+<section class="slide center" data-slide="3">
+  <h2>El <span class="highlight">Equipo</span></h2>
+  <p class="subtitle" style="max-width:850px;">Cada integrante es Product Owner de IA en su área</p>
+  <div class="org-leader">
+    <h3>🎯 Coordinación General</h3>
+    <p style="font-weight:600; font-size:1rem; margin-bottom:.3em;">Iván Font &amp; Ricard Plana</p>
+    <p style="color:var(--text-muted);font-size:.9rem;">Líderes del Grupo — Visión estratégica, alineación con dirección y supervisión</p>
+  </div>
+  <div class="org-grid">
+    <div class="org-card">
+      <div class="org-abbr">CE</div>
+      <h3>Customer Engagement</h3>
+      <p style="font-weight:600; font-size:.85rem; margin-bottom:.2em;">Miriam Artero</p>
+      <p>IA en CRM y experiencia de cliente</p>
+    </div>
+    <div class="org-card">
+      <div class="org-abbr">FN</div>
+      <h3>Finance</h3>
+      <p style="font-weight:600; font-size:.85rem; margin-bottom:.2em;">Laura Florido</p>
+      <p>IA en análisis financiero y reporting</p>
+    </div>
+    <div class="org-card">
+      <div class="org-abbr">SC</div>
+      <h3>SCM</h3>
+      <p style="font-weight:600; font-size:.85rem; margin-bottom:.2em;">Omar Folques</p>
+      <p>IA en logística y cadena de suministro</p>
+    </div>
+    <div class="org-card">
+      <div class="org-abbr">BC</div>
+      <h3>Business Central</h3>
+      <p style="font-weight:600; font-size:.85rem; margin-bottom:.2em;">Dani Gaya</p>
+      <p>IA en BC y automatización de procesos</p>
+    </div>
+    <div class="org-card">
+      <div class="org-abbr">PF</div>
+      <h3>Prog. Finance/PP</h3>
+      <p style="font-weight:600; font-size:.85rem; margin-bottom:.2em;">Adrián Salas</p>
+      <p>Desarrollo IA para Finance y producción</p>
+    </div>
+    <div class="org-card">
+      <div class="org-abbr">PW</div>
+      <h3>Prog. Web/Data</h3>
+      <p style="font-weight:600; font-size:.85rem; margin-bottom:.2em;">Paula Romero</p>
+      <p>Desarrollo IA para web, datos e integraciones</p>
+    </div>
+    <div class="org-card">
+      <div class="org-abbr">AZ</div>
+      <h3>Azure</h3>
+      <p style="font-weight:600; font-size:.85rem; margin-bottom:.2em;">Carles Gelonch</p>
+      <p>Infraestructura cloud, MLOps y gobernanza</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== SLIDE 5: SECCIÓN TAREAS ============================== -->
+<section class="slide center" data-slide="4">
+  <div class="glow" style="top:50%;left:50%;transform:translate(-50%,-50%);"></div>
+  <div class="section-num">02</div>
+  <div class="section-title">Tareas del <span class="highlight">Product Owner</span></div>
+  <div class="section-sub">Qué se espera de cada integrante del grupo</div>
+</section>
+
+<!-- ============================== SLIDE 6: ROL DEL PO ============================== -->
+<section class="slide center" data-slide="5">
+  <h2>Rol del <span class="highlight">Product Owner de IA</span></h2>
+  <p class="subtitle" style="max-width:850px;">Eres el referente de IA en tu área. Tu misión: que tu equipo adopte y aproveche la IA.</p>
+  <div class="cols cols-2 full-w" style="margin-top:1em;">
+    <div>
+      <div class="card" style="border-left:4px solid var(--primary); margin-bottom:1em;">
+        <h3>📡 Vigilancia Tecnológica</h3>
+        <p style="color:var(--text-muted);">Estar al tanto de las novedades de IA relevantes para tu área. Publicar hallazgos en el Radar de ALBA.</p>
+        <span class="freq-badge freq-weekly">Semanal</span>
+      </div>
+      <div class="card" style="border-left:4px solid var(--accent); margin-bottom:1em;">
+        <h3>📚 Creación de Conocimiento</h3>
+        <p style="color:var(--text-muted);">Escribir artículos en Knowledge sobre IA aplicada a tu dominio. Documentar buenas prácticas y aprendizajes.</p>
+        <span class="freq-badge freq-monthly">Mensual</span>
+      </div>
+      <div class="card" style="border-left:4px solid var(--warning);">
+        <h3>🎓 Formación del Equipo</h3>
+        <p style="color:var(--text-muted);">Identificar necesidades formativas de tu área. Proponer rutas de Academy y organizar sesiones de Guild.</p>
+        <span class="freq-badge freq-ongoing">Continuo</span>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="border-left:4px solid var(--danger); margin-bottom:1em;">
+        <h3>🧪 Innovación y Experimentación</h3>
+        <p style="color:var(--text-muted);">Proponer experimentos en el Lab. Validar herramientas y técnicas antes de adoptarlas en proyectos reales.</p>
+        <span class="freq-badge freq-ongoing">Continuo</span>
+      </div>
+      <div class="card" style="border-left:4px solid var(--primary); margin-bottom:1em;">
+        <h3>💼 Soluciones Comerciales</h3>
+        <p style="color:var(--text-muted);">Contribuir al catálogo de Solutions con propuestas de IA para tu dominio. Participar en demos a clientes.</p>
+        <span class="freq-badge freq-monthly">Mensual</span>
+      </div>
+      <div class="card" style="border-left:4px solid var(--accent);">
+        <h3>📊 Reporte al Coordinador</h3>
+        <p style="color:var(--text-muted);">Reportar avances, métricas de adopción, obstáculos y próximos pasos. Reunión mensual de seguimiento.</p>
+        <span class="freq-badge freq-monthly">Mensual</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== SLIDE 7: TAREAS CONCRETAS SEMANALES ============================== -->
+<section class="slide center" data-slide="6">
+  <h2>Tareas <span class="highlight">Semanales</span></h2>
+  <p class="subtitle">Lo que cada PO debería hacer cada semana (15–30 min)</p>
+  <div class="cols cols-3 full-w" style="margin-top:1em;">
+    <div class="task-card">
+      <div class="task-num">1</div>
+      <h3>Revisar el Radar</h3>
+      <p>Entra al módulo <strong>Radar</strong> de ALBA y revisa las novedades de la semana. Si encuentras algo relevante para tu área, márcalo o compártelo.</p>
+      <span class="freq-badge freq-weekly">~5 min</span>
+    </div>
+    <div class="task-card">
+      <div class="task-num">2</div>
+      <h3>Leer el Weekly</h3>
+      <p>Lee el <strong>ALBA Weekly</strong> (newsletter automática). Identifica noticias que puedan afectar a tus proyectos o a tu equipo.</p>
+      <span class="freq-badge freq-weekly">~5 min</span>
+    </div>
+    <div class="task-card">
+      <div class="task-num">3</div>
+      <h3>Aportar al Radar</h3>
+      <p>Si has visto algo interesante (artículo, herramienta, novedad), <strong>publícalo en el Radar</strong>. Un ítem breve con enlace y por qué es relevante.</p>
+      <span class="freq-badge freq-weekly">~5 min</span>
+    </div>
+  </div>
+  <div style="margin-top:1.5em; background:var(--bg-card); border-radius:12px; padding:1em 1.5em; max-width:800px;">
+    <p style="color:var(--text-muted); font-size:.95rem; text-align:center;">
+      💡 <strong>Clave:</strong> no se trata de dedicar horas, sino de mantener un flujo constante de información. 15 minutos a la semana marcan la diferencia.
+    </p>
+  </div>
+</section>
+
+<!-- ============================== SLIDE 8: TAREAS MENSUALES ============================== -->
+<section class="slide center" data-slide="7">
+  <h2>Tareas <span class="highlight">Mensuales</span></h2>
+  <p class="subtitle">Una vez al mes, con más profundidad</p>
+  <div class="cols cols-2 full-w" style="margin-top:1em;">
+    <div>
+      <div class="card" style="border-left:4px solid var(--primary); margin-bottom:1em;">
+        <h3>📝 Escribir un artículo en Knowledge</h3>
+        <p style="color:var(--text-muted);">Un artículo sobre IA aplicada a tu área: una buena práctica, un caso de uso, un tutorial, un prompt útil, una arquitectura…</p>
+        <ul class="checklist" style="margin-top:.5em;">
+          <li>Elegir tema relevante para tu equipo</li>
+          <li>Redactar en Markdown dentro de ALBA</li>
+          <li>Asignar categoría y ecosistema</li>
+          <li>Publicar (o enviar a revisión)</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="border-left:4px solid var(--accent); margin-bottom:1em;">
+        <h3>📊 Reporte mensual</h3>
+        <p style="color:var(--text-muted);">Breve informe al Coordinador sobre el estado de la IA en tu área:</p>
+        <ul class="checklist" style="margin-top:.5em;">
+          <li>¿Qué herramientas de IA están usando?</li>
+          <li>¿Qué ha funcionado? ¿Qué no?</li>
+          <li>¿Qué necesidades formativas hay?</li>
+          <li>¿Hay oportunidades comerciales con IA?</li>
+          <li>Próximos pasos / propuestas</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="cols cols-2 full-w" style="margin-top:.5em;">
+    <div class="card" style="border-left:4px solid var(--warning);">
+      <h3>👥 Sesión de Guild (cuando toque)</h3>
+      <p style="color:var(--text-muted);">Proponer o participar en sesiones de formación interna. Compartir un caso de éxito, una demo o un hallazgo con el grupo.</p>
+    </div>
+    <div class="card" style="border-left:4px solid var(--danger);">
+      <h3>💼 Revisar Solutions</h3>
+      <p style="color:var(--text-muted);">¿Hay alguna solución nueva de IA que podamos ofrecer a clientes de tu área? Proponer o actualizar fichas en el catálogo.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== SLIDE 9: SECCIÓN HERRAMIENTA ============================== -->
+<section class="slide center" data-slide="8">
+  <div class="glow" style="top:50%;left:50%;transform:translate(-50%,-50%);"></div>
+  <div class="section-num">03</div>
+  <div class="section-title">ALBA <span class="highlight">Central Hub</span></div>
+  <div class="section-sub">La herramienta donde centralizamos todo</div>
+</section>
+
+<!-- ============================== SLIDE 10: MÓDULOS QUE USARÁS ============================== -->
+<section class="slide center" data-slide="9">
+  <h2>Módulos que <span class="highlight">usarás</span></h2>
+  <p class="subtitle">Tu día a día como PO de IA en ALBA</p>
+  <div class="cols cols-4 full-w" style="margin-top:1.5em;">
+    <div class="pillar-card" style="border-top-color:var(--accent);">
+      <h3>📡 Radar</h3>
+      <ul>
+        <li>Publicar novedades de IA</li>
+        <li>Revisar novedades semanales</li>
+        <li>Leer el ALBA Weekly</li>
+        <li>Marcar relevancia</li>
+      </ul>
+    </div>
+    <div class="pillar-card">
+      <h3>📚 Knowledge</h3>
+      <ul>
+        <li>Escribir artículos</li>
+        <li>Documentar buenas prácticas</li>
+        <li>Compartir prompts útiles</li>
+        <li>Categorizar por ecosistema</li>
+      </ul>
+    </div>
+    <div class="pillar-card" style="border-top-color:var(--warning);">
+      <h3>👥 Guild</h3>
+      <ul>
+        <li>Proponer sesiones</li>
+        <li>Asistir a sesiones</li>
+        <li>Compartir demos internas</li>
+        <li>Registrar asistencia</li>
+      </ul>
+    </div>
+    <div class="pillar-card" style="border-top-color:var(--danger);">
+      <h3>🧪 Lab</h3>
+      <ul>
+        <li>Proponer experimentos</li>
+        <li>Documentar resultados</li>
+        <li>Validar herramientas</li>
+        <li>Registrar aprendizajes</li>
+      </ul>
+    </div>
+  </div>
+  <div style="margin-top:1.2em; display:flex; gap:.6em; justify-content:center; flex-wrap:wrap;">
+    <span class="tag">Solutions</span><span class="tag">Demos</span><span class="tag">Academy</span><span class="tag">Assistant</span>
+    <span style="color:var(--text-muted);font-size:.85rem;margin-left:.5em;">← También disponibles para ti</span>
+  </div>
+</section>
+
+<!-- ============================== SLIDE 11: EJEMPLO: CÓMO PUBLICAR EN RADAR ============================== -->
+<section class="slide center" data-slide="10">
+  <h2>Ejemplo: Publicar en el <span class="highlight">Radar</span></h2>
+  <p class="subtitle">Paso a paso — en 2 minutos</p>
+  <div class="cols cols-4 full-w" style="margin-top:1.5em;">
+    <div class="card center">
+      <span class="icon">1️⃣</span>
+      <h3>Encuentra algo</h3>
+      <p style="color:var(--text-muted);font-size:.9rem;">Un artículo, una herramienta nueva, un anuncio de Microsoft…</p>
+    </div>
+    <div class="card center">
+      <span class="icon">2️⃣</span>
+      <h3>Entra al Radar</h3>
+      <p style="color:var(--text-muted);font-size:.9rem;">Accede a ALBA → Radar → botón <strong>"Nuevo"</strong></p>
+    </div>
+    <div class="card center">
+      <span class="icon">3️⃣</span>
+      <h3>Rellena el formulario</h3>
+      <p style="color:var(--text-muted);font-size:.9rem;">Título, enlace, categoría, relevancia (alta/media/baja) y un breve comentario</p>
+    </div>
+    <div class="card center">
+      <span class="icon">4️⃣</span>
+      <h3>Publicar</h3>
+      <p style="color:var(--text-muted);font-size:.9rem;">¡Listo! Aparece en el Radar y puede salir en el Weekly automático</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== SLIDE 12: EJEMPLO: ARTÍCULO KNOWLEDGE ============================== -->
+<section class="slide center" data-slide="11">
+  <h2>Ejemplo: Artículo en <span class="highlight">Knowledge</span></h2>
+  <p class="subtitle">Ideas de artículos por área</p>
+  <table style="margin-top:1em;">
+    <thead>
+      <tr>
+        <th>Área</th>
+        <th>Idea de artículo</th>
+        <th>Tipo</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>CE</strong></td><td>"Cómo usar Copilot para personalizar emails de campaña en D365 CE"</td><td>Buena práctica</td></tr>
+      <tr><td><strong>Finance</strong></td><td>"Automatizar conciliaciones con IA en D365 Finance"</td><td>Caso de uso</td></tr>
+      <tr><td><strong>SCM</strong></td><td>"Predicción de demanda con Azure ML en Supply Chain"</td><td>Arquitectura</td></tr>
+      <tr><td><strong>BC</strong></td><td>"Copilot en Business Central: qué funciona y qué no"</td><td>Artículo</td></tr>
+      <tr><td><strong>Prog. Finance</strong></td><td>"Prompts útiles para generar código X++ con IA"</td><td>Prompt</td></tr>
+      <tr><td><strong>Prog. Web</strong></td><td>"RAG sobre documentación interna con Azure AI Search"</td><td>Acelerador</td></tr>
+      <tr><td><strong>Azure</strong></td><td>"Guía de gobernanza de modelos de IA en Azure"</td><td>Buena práctica</td></tr>
+    </tbody>
+  </table>
+  <p style="color:var(--text-muted); font-size:.85rem; margin-top:1em;">
+    📌 No hace falta que sea largo. Un artículo de 300–500 palabras con ejemplos prácticos ya aporta mucho valor.
+  </p>
+</section>
+
+<!-- ============================== SLIDE 13: SECCIÓN CALENDARIO ============================== -->
+<section class="slide center" data-slide="12">
+  <div class="glow" style="top:50%;left:50%;transform:translate(-50%,-50%);"></div>
+  <div class="section-num">04</div>
+  <div class="section-title">Calendario y <span class="highlight">Próximos Pasos</span></div>
+  <div class="section-sub">Qué viene a continuación</div>
+</section>
+
+<!-- ============================== SLIDE 14: TIMELINE ============================== -->
+<section class="slide center" data-slide="13">
+  <h2>Hoja de <span class="highlight">Ruta</span></h2>
+  <p class="subtitle">Próximas semanas</p>
+  <div class="timeline">
+    <div class="timeline-item current">
+      <div class="dot"></div>
+      <h3>Mayo 2026</h3>
+      <p>Reunión de kickoff del grupo. Acceso a ALBA Central Hub. Primer contacto con la plataforma.</p>
+    </div>
+    <div class="timeline-item next">
+      <div class="dot"></div>
+      <h3>Junio 2026</h3>
+      <p>Cada PO publica al menos 2 ítems en Radar y 1 artículo en Knowledge. Primera sesión de Guild.</p>
+    </div>
+    <div class="timeline-item next">
+      <div class="dot"></div>
+      <h3>Julio 2026</h3>
+      <p>Primer reporte mensual. Revisión de métricas de adopción. Propuestas de experimentos en Lab.</p>
+    </div>
+    <div class="timeline-item">
+      <div class="dot"></div>
+      <h3>Sept 2026</h3>
+      <p>Formación por áreas (según calendario). Catálogo de Solutions con IA actualizado.</p>
+    </div>
+    <div class="timeline-item">
+      <div class="dot"></div>
+      <h3>Q4 2026</h3>
+      <p>Revisión trimestral de impacto. Casos de éxito documentados. Expansión a más áreas.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== SLIDE 15: CHECKLIST PRIMERAS SEMANAS ============================== -->
+<section class="slide center" data-slide="14">
+  <h2>Checklist: <span class="highlight">Primeras Semanas</span></h2>
+  <p class="subtitle">Lo que necesitas hacer para arrancar</p>
+  <div class="cols cols-2 full-w" style="margin-top:1em;">
+    <div class="card" style="border-left:4px solid var(--primary);">
+      <h3>📋 Semana 1 — Acceso y exploración</h3>
+      <ul class="checklist">
+        <li>Acceder a ALBA Central Hub con tu cuenta corporativa</li>
+        <li>Explorar los módulos: Radar, Knowledge, Guild, Lab</li>
+        <li>Leer el ALBA Weekly de esta semana</li>
+        <li>Marcar contenido favorito que te interese</li>
+      </ul>
+    </div>
+    <div class="card" style="border-left:4px solid var(--accent);">
+      <h3>📋 Semana 2 — Primeras aportaciones</h3>
+      <ul class="checklist">
+        <li>Publicar tu primer ítem en el Radar</li>
+        <li>Pensar en el tema de tu primer artículo Knowledge</li>
+        <li>Hablar con tu equipo: ¿qué herramientas de IA usan?</li>
+        <li>Identificar una necesidad formativa de tu área</li>
+      </ul>
+    </div>
+  </div>
+  <div class="cols cols-2 full-w" style="margin-top:1em;">
+    <div class="card" style="border-left:4px solid var(--warning);">
+      <h3>📋 Semana 3–4 — Consolidación</h3>
+      <ul class="checklist">
+        <li>Publicar tu primer artículo en Knowledge</li>
+        <li>Tener al menos 3 ítems en Radar</li>
+        <li>Proponer un tema para sesión de Guild</li>
+        <li>Preparar tu primer reporte mensual</li>
+      </ul>
+    </div>
+    <div class="card" style="border-left:4px solid var(--danger);">
+      <h3>📋 Mes 2 en adelante — Rutina</h3>
+      <ul class="checklist">
+        <li>15 min/semana revisando Radar + Weekly</li>
+        <li>1 artículo Knowledge al mes</li>
+        <li>Reporte mensual al Coordinador</li>
+        <li>Participar en sesiones de Guild</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== SLIDE 16: MÉTRICAS DE SEGUIMIENTO ============================== -->
+<section class="slide center" data-slide="15">
+  <h2>¿Cómo mediremos el <span class="highlight">éxito</span>?</h2>
+  <p class="subtitle">KPIs del grupo de IA</p>
+  <div class="cols cols-4 full-w" style="margin-top:1.5em;">
+    <div class="card center" style="border-top:3px solid var(--primary);">
+      <p style="font-size:2.5rem; font-weight:800; color:var(--primary-light);">2+</p>
+      <h3>Ítems Radar</h3>
+      <p style="color:var(--text-muted);font-size:.85rem;">por PO al mes</p>
+    </div>
+    <div class="card center" style="border-top:3px solid var(--accent);">
+      <p style="font-size:2.5rem; font-weight:800; color:var(--accent);">1</p>
+      <h3>Artículo Knowledge</h3>
+      <p style="color:var(--text-muted);font-size:.85rem;">por PO al mes</p>
+    </div>
+    <div class="card center" style="border-top:3px solid var(--warning);">
+      <p style="font-size:2.5rem; font-weight:800; color:var(--warning);">1</p>
+      <h3>Sesión Guild</h3>
+      <p style="color:var(--text-muted);font-size:.85rem;">por trimestre</p>
+    </div>
+    <div class="card center" style="border-top:3px solid var(--danger);">
+      <p style="font-size:2.5rem; font-weight:800; color:#f87171;">100%</p>
+      <h3>Reporte Mensual</h3>
+      <p style="color:var(--text-muted);font-size:.85rem;">de cada PO</p>
+    </div>
+  </div>
+  <div style="margin-top:1.5em; background:var(--bg-card); border-radius:12px; padding:1em 1.5em; max-width:800px;">
+    <p style="color:var(--text-muted); font-size:.95rem; text-align:center;">
+      📈 Todo esto se puede ver en el <strong>Dashboard de Admin</strong> de ALBA. Transparencia total.
+    </p>
+  </div>
+</section>
+
+<!-- ============================== SLIDE 17: RESUMEN ============================== -->
+<section class="slide center" data-slide="16">
+  <div class="glow" style="top:-100px;right:-100px;"></div>
+  <h2>En <span class="highlight">Resumen</span></h2>
+  <div class="cols cols-3 full-w" style="margin-top:1.5em;">
+    <div class="card center" style="border-top:3px solid var(--primary);">
+      <span class="icon">⏱️</span>
+      <h3>Poco tiempo</h3>
+      <p style="color:var(--text-muted);">15–30 min a la semana. No es un proyecto extra, es un hábito.</p>
+    </div>
+    <div class="card center" style="border-top:3px solid var(--accent);">
+      <span class="icon">🎯</span>
+      <h3>Tareas claras</h3>
+      <p style="color:var(--text-muted);">Radar semanal, Knowledge mensual, Guild trimestral, Reporte mensual.</p>
+    </div>
+    <div class="card center" style="border-top:3px solid var(--warning);">
+      <span class="icon">🤝</span>
+      <h3>No estás solo</h3>
+      <p style="color:var(--text-muted);">Los coordinadores estamos aquí para ayudar. ALBA centraliza todo y facilita el trabajo.</p>
+    </div>
+  </div>
+  <div style="margin-top:2em;">
+    <p style="font-size:1.3rem; font-weight:700;">
+      <span class="highlight">¿Preguntas?</span>
+    </p>
+    <p style="color:var(--text-muted); margin-top:.5em; font-size:1rem;">
+      Iván Font &amp; Ricard Plana &nbsp;·&nbsp; Grupo de IA · Algoritmia
+    </p>
+  </div>
+</section>
+
+</div><!-- /deck -->
+
+<!-- ── Controls ── -->
+<button class="fs-btn" onclick="toggleFS()" title="Pantalla completa (F)">⛶ Pantalla completa</button>
+<div class="controls">
+  <button onclick="prev()" title="Anterior (←)" aria-label="Anterior">◀</button>
+  <span class="slide-counter" id="counter">1 / 17</span>
+  <button onclick="next()" title="Siguiente (→)" aria-label="Siguiente">▶</button>
+</div>
+
+<script>
+(function(){
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+
+  function go(n) {
+    if (n < 0 || n >= total) return;
+    slides.forEach(s => { s.classList.remove('active','prev'); });
+    if (n > current) slides[current].classList.add('prev');
+    current = n;
+    slides[current].classList.add('active');
+    document.getElementById('counter').textContent = (current+1) + ' / ' + total;
+    document.getElementById('progressBar').style.width = ((current+1)/total*100) + '%';
+  }
+
+  window.next = function(){ go(current+1); };
+  window.prev = function(){ go(current-1); };
+
+  window.toggleFS = function(){
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(()=>{});
+    } else {
+      document.exitFullscreen();
+    }
+  };
+
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); go(current+1); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); go(current-1); }
+    else if (e.key === 'Home') { e.preventDefault(); go(0); }
+    else if (e.key === 'End') { e.preventDefault(); go(total-1); }
+    else if (e.key === 'f' || e.key === 'F') { window.toggleFS(); }
+  });
+
+  let touchStartX = 0;
+  document.addEventListener('touchstart', function(e){ touchStartX = e.changedTouches[0].screenX; }, {passive:true});
+  document.addEventListener('touchend', function(e){
+    const dx = e.changedTouches[0].screenX - touchStartX;
+    if (Math.abs(dx) > 50) { dx < 0 ? go(current+1) : go(current-1); }
+  }, {passive:true});
+
+  go(0);
+})();
+</script>
+</body>
+</html>
