@@ -91,15 +91,33 @@ def _post(url: str, body: dict) -> dict:
 def get_current_sprint() -> dict | None:
     """Devuelve el sprint activo del equipo Grupo IA, o None si no hay ninguno."""
     proj = ADO_PROJECT.replace(" ", "%20")
-    team = ADO_TEAM.replace(" ", "%20")
-    url  = f"{ADO_ORG}/{proj}/{team}/_apis/work/teamsettings/iterations?$timeframe=current&api-version=7.0"
+    # Usar GUID del equipo en la URL para evitar ambigüedades con el nombre
+    url_current = (
+        f"{ADO_ORG}/{proj}/{TEAM_GUID}/_apis/work/teamsettings/iterations"
+        f"?$timeframe=current&api-version=7.0"
+    )
     try:
-        data = _get(url)
+        data = _get(url_current)
         iterations = data.get("value", [])
-        return iterations[0] if iterations else None
+        if iterations:
+            return iterations[0]
     except (HTTPError, URLError) as exc:
-        print(f"ERROR al obtener sprint activo: {exc}")
-        return None
+        print(f"WARN: timeframe=current falló ({exc}), listando todas las iteraciones…")
+
+    # Fallback: listar todas las iteraciones y devolver la marcada como 'current'
+    url_all = (
+        f"{ADO_ORG}/{proj}/{TEAM_GUID}/_apis/work/teamsettings/iterations"
+        f"?api-version=7.0"
+    )
+    try:
+        data = _get(url_all)
+        for it in data.get("value", []):
+            if it.get("attributes", {}).get("timeFrame") == "current":
+                return it
+        print("INFO: no hay ninguna iteración marcada como 'current'.")
+    except (HTTPError, URLError) as exc:
+        print(f"ERROR al obtener iteraciones: {exc}")
+    return None
 
 
 def get_sprint_items(iteration_path: str) -> list[dict]:
