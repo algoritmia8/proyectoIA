@@ -1,0 +1,47 @@
+name: "Sprint Review — Viernes 8:00"
+
+on:
+  schedule:
+    # 8:00 AM hora España (CEST = UTC+2 → 06:00 UTC en verano)
+    # Ajustar a 07:00 UTC en invierno (CET = UTC+1)
+    - cron: "0 6 * * 5"
+  workflow_dispatch:   # Ejecución manual desde GitHub Actions
+
+permissions:
+  contents: write   # Necesario para el autocommit de la memoria
+
+jobs:
+  sprint-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run Sprint Review Agent
+        env:
+          ADO_PAT:       ${{ secrets.ADO_PAT }}
+          SMTP_HOST:     smtp.office365.com
+          SMTP_PORT:     "587"
+          SMTP_USER:     ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          EMAIL_TO:      ifont@algoritmia8.com
+        run: python .github/scripts/sprint_review.py
+
+      - name: Commit memory update
+        run: |
+          git config user.name  "sprint-review-bot"
+          git config user.email "actions@github.com"
+          git add sprint-memory/
+          git diff --staged --quiet || (
+            git commit -m "chore(sprint): revisión semanal $(date -u '+%Y-%m-%d')" &&
+            git push
+          )
