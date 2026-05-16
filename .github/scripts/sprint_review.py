@@ -448,11 +448,11 @@ def build_email(
         summary = ai_eval.get("resumen_ejecutivo", "")
         if summary:
             ai_summary_html = (
-                '<div style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);'
-                'color:white;padding:20px 24px;border-radius:8px;margin:20px 0">'
-                '<div style="font-size:1.05rem;font-weight:bold;margin-bottom:8px">'
+                '<div style="background-color:#5a4fcf;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);'
+                'color:#ffffff;padding:20px 24px;border-radius:8px;margin:20px 0">'
+                '<div style="font-size:1.05rem;font-weight:bold;margin-bottom:8px;color:#ffffff">'
                 '🤖 Análisis IA del sprint</div>'
-                f'<p style="margin:0;line-height:1.7">{summary}</p>'
+                f'<p style="margin:0;line-height:1.7;color:#ffffff">{summary}</p>'
                 '</div>'
             )
 
