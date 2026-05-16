@@ -1,6 +1,6 @@
 # Sprint Memory — Sprint-01
 
-> Última actualización: **2026-05-16 21:11 UTC** | Progreso: **0%** (0/64)
+> Última actualización: **2026-05-16 21:15 UTC** | Progreso: **0%** (0/64)
 
 ## Estado del sprint
 
@@ -80,327 +80,327 @@
 {
   "sprint": "Sprint-01",
   "iteration_path": "Algoritmia IA\\2026\\Q2\\Sprint-01",
-  "last_run": "2026-05-16T21:11:44.847233+00:00",
+  "last_run": "2026-05-16T21:15:13.510708+00:00",
   "items": {
     "13816": {
       "state": "Proposed",
       "title": "🚀 Arranque y Gobierno",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13829": {
       "state": "00 - Identificado",
       "title": "Alta y onboarding en ALBA",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13830": {
       "state": "00 - Identificado",
       "title": "Kickoff del Grupo IA",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13863": {
       "state": "00 - Identificado",
       "title": "Configurar acceso ALBA y explorar Radar/Knowledge - Coordinacion",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13864": {
       "state": "00 - Identificado",
       "title": "Reporte mensual a Coordinacion - Coordinacion",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13865": {
       "state": "00 - Identificado",
       "title": "Configurar acceso ALBA y explorar Radar/Knowledge - Customer Engagement",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13866": {
       "state": "00 - Identificado",
       "title": "Primera aportacion al Radar - Customer Engagement",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13869": {
       "state": "00 - Identificado",
       "title": "Reporte mensual a Coordinacion - Customer Engagement",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13870": {
       "state": "00 - Identificado",
       "title": "Configurar acceso ALBA y explorar Radar/Knowledge - Business Central",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13871": {
       "state": "00 - Identificado",
       "title": "Primera aportacion al Radar - Business Central",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13874": {
       "state": "00 - Identificado",
       "title": "Reporte mensual a Coordinacion - Business Central",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13875": {
       "state": "00 - Identificado",
       "title": "Configurar acceso ALBA y explorar Radar/Knowledge - Finance",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13876": {
       "state": "00 - Identificado",
       "title": "Primera aportacion al Radar - Finance",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13879": {
       "state": "00 - Identificado",
       "title": "Reporte mensual a Coordinacion - Finance",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13880": {
       "state": "00 - Identificado",
       "title": "Configurar acceso ALBA y explorar Radar/Knowledge - SCM",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13881": {
       "state": "00 - Identificado",
       "title": "Primera aportacion al Radar - SCM",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13884": {
       "state": "00 - Identificado",
       "title": "Reporte mensual a Coordinacion - SCM",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13885": {
       "state": "00 - Identificado",
       "title": "Configurar acceso ALBA y explorar Radar/Knowledge - Prog. Finance-PP",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13886": {
       "state": "00 - Identificado",
       "title": "Primera aportacion al Radar - Prog. Finance-PP",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13889": {
       "state": "00 - Identificado",
       "title": "Reporte mensual a Coordinacion - Prog. Finance-PP",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13890": {
       "state": "00 - Identificado",
       "title": "Configurar acceso ALBA y explorar Radar/Knowledge - Prog. Web-Data",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13891": {
       "state": "00 - Identificado",
       "title": "Primera aportacion al Radar - Prog. Web-Data",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13894": {
       "state": "00 - Identificado",
       "title": "Reporte mensual a Coordinacion - Prog. Web-Data",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13895": {
       "state": "00 - Identificado",
       "title": "Configurar acceso ALBA y explorar Radar/Knowledge - Azure",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13896": {
       "state": "00 - Identificado",
       "title": "Primera aportacion al Radar - Azure",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13899": {
       "state": "00 - Identificado",
       "title": "Reporte mensual a Coordinacion - Azure",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13900": {
       "state": "Proposed",
       "title": "Alta de usuario en ALBA - Coordinacion",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13901": {
       "state": "Proposed",
       "title": "Lectura del Plan de Negocio IA - Coordinacion",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13902": {
       "state": "Proposed",
       "title": "Asistir kickoff Grupo IA - Coordinacion",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13903": {
       "state": "Proposed",
       "title": "Alta de usuario en ALBA - Customer Engagement",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13904": {
       "state": "Proposed",
       "title": "Lectura del Plan de Negocio IA - Customer Engagement",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13905": {
       "state": "Proposed",
       "title": "Asistir kickoff Grupo IA - Customer Engagement",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13906": {
       "state": "Proposed",
       "title": "Identificar 1 novedad IA del area - Customer Engagement",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13907": {
       "state": "Proposed",
       "title": "Publicar item en Radar - Customer Engagement",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13911": {
       "state": "Proposed",
       "title": "Alta de usuario en ALBA - Business Central",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13912": {
       "state": "Proposed",
       "title": "Lectura del Plan de Negocio IA - Business Central",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13913": {
       "state": "Proposed",
       "title": "Asistir kickoff Grupo IA - Business Central",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13914": {
       "state": "Proposed",
       "title": "Identificar 1 novedad IA del area - Business Central",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13915": {
       "state": "Proposed",
       "title": "Publicar item en Radar - Business Central",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13919": {
       "state": "Proposed",
       "title": "Alta de usuario en ALBA - Finance",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13920": {
       "state": "Proposed",
       "title": "Lectura del Plan de Negocio IA - Finance",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13921": {
       "state": "Proposed",
       "title": "Asistir kickoff Grupo IA - Finance",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13922": {
       "state": "Proposed",
       "title": "Identificar 1 novedad IA del area - Finance",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13923": {
       "state": "Proposed",
       "title": "Publicar item en Radar - Finance",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13927": {
       "state": "Proposed",
       "title": "Alta de usuario en ALBA - SCM",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13928": {
       "state": "Proposed",
       "title": "Lectura del Plan de Negocio IA - SCM",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13929": {
       "state": "Proposed",
       "title": "Asistir kickoff Grupo IA - SCM",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13930": {
       "state": "Proposed",
       "title": "Identificar 1 novedad IA del area - SCM",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13931": {
       "state": "Proposed",
       "title": "Publicar item en Radar - SCM",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13935": {
       "state": "Proposed",
       "title": "Alta de usuario en ALBA - Prog. Finance-PP",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13936": {
       "state": "Proposed",
       "title": "Lectura del Plan de Negocio IA - Prog. Finance-PP",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13937": {
       "state": "Proposed",
       "title": "Asistir kickoff Grupo IA - Prog. Finance-PP",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13938": {
       "state": "Proposed",
       "title": "Identificar 1 novedad IA del area - Prog. Finance-PP",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13939": {
       "state": "Proposed",
       "title": "Publicar item en Radar - Prog. Finance-PP",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13943": {
       "state": "Proposed",
       "title": "Alta de usuario en ALBA - Prog. Web-Data",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13944": {
       "state": "Proposed",
       "title": "Lectura del Plan de Negocio IA - Prog. Web-Data",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13945": {
       "state": "Proposed",
       "title": "Asistir kickoff Grupo IA - Prog. Web-Data",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13946": {
       "state": "Proposed",
       "title": "Identificar 1 novedad IA del area - Prog. Web-Data",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13947": {
       "state": "Proposed",
       "title": "Publicar item en Radar - Prog. Web-Data",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13951": {
       "state": "Proposed",
       "title": "Alta de usuario en ALBA - Azure",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13952": {
       "state": "Proposed",
       "title": "Lectura del Plan de Negocio IA - Azure",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13953": {
       "state": "Proposed",
       "title": "Asistir kickoff Grupo IA - Azure",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13954": {
       "state": "Proposed",
       "title": "Identificar 1 novedad IA del area - Azure",
-      "stale_count": 0
+      "stale_count": 1
     },
     "13955": {
       "state": "Proposed",
       "title": "Publicar item en Radar - Azure",
-      "stale_count": 0
+      "stale_count": 1
     }
   }
 }
